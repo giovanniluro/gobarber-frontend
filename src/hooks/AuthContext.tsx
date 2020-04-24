@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useState } from 'react';
+import React, { createContext, useCallback, useState, useContext } from 'react';
 import api from '../services/api';
 
 interface RequestDTO {
@@ -12,6 +12,7 @@ interface AuthState{
 }
 
 interface AuthContextData {
+  signOut(): void;
   signIn(credentials: RequestDTO): Promise<void>;
   user: object;
 }
@@ -38,9 +39,23 @@ export const AuthProvider: React.FC = ({ children }) => {
     setData({token, user});
   }, []);
 
+  const signOut = useCallback(() => {
+    localStorage.removeItem('@goBarber:token');
+    localStorage.removeItem('@goBarber:user');
+    setData({} as AuthState);
+  }, []);
+
   return (
-    <AuthContext.Provider value={{signIn, user: data.user}}>
+    <AuthContext.Provider value={{signOut, signIn, user: data.user}}>
       {children}
     </AuthContext.Provider>
   )
+}
+
+export function useAuth(): AuthContextData {
+  const context = useContext(AuthContext);
+
+  if(!context) throw Error("No context available");
+
+  return context;
 }

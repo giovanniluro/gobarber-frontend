@@ -1,6 +1,6 @@
-import React, {useRef, useCallback, useContext} from 'react';
+import React, {useRef, useCallback} from 'react';
 import * as Yup from 'yup';
-import { AuthContext } from '../../context/AuthContext';
+import { useAuth } from '../../hooks/AuthContext';
 import { Container, Content, Background } from './styles';
 import logoImg from '../../assets/logo.svg';
 import { FiLogIn, FiLock, FiMail} from 'react-icons/fi';
@@ -17,7 +17,7 @@ interface UserData{
 
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
-  const {user, signIn } =  useContext(AuthContext);
+  const {user, signIn } = useAuth();
 
   const handleSubmit = useCallback(async (data: UserData) => {
     try {
@@ -35,8 +35,14 @@ const SignIn: React.FC = () => {
          email: data.email
       });
     } catch (error) {
-      const erros = getValidationErrors(error);
-      formRef.current?.setErrors(erros);
+
+      if(error instanceof Yup.ValidationError){
+        const erros = getValidationErrors(error);
+        formRef.current?.setErrors(erros);
+      }
+
+      //disparar um toast
+
     }
   }, [signIn]);
 
