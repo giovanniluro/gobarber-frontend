@@ -1,5 +1,6 @@
-import React, {useRef, useCallback} from 'react';
+import React, {useRef, useCallback, useContext} from 'react';
 import * as Yup from 'yup';
+import { AuthContext } from '../../context/AuthContext';
 import { Container, Content, Background } from './styles';
 import logoImg from '../../assets/logo.svg';
 import { FiLogIn, FiLock, FiMail} from 'react-icons/fi';
@@ -9,26 +10,35 @@ import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
 import getValidationErrors from '../../utils/getValidationErrors';
 
+interface UserData{
+  email: string;
+  password: string;
+}
+
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
+  const {user, signIn } =  useContext(AuthContext);
 
-  const handleSubmit = useCallback(async (data: object) => {
+  const handleSubmit = useCallback(async (data: UserData) => {
     try {
       formRef.current?.setErrors({});
       const schema = Yup.object().shape({
-        name: Yup.string().required("Insira o seu nome!"),
         email: Yup.string().required("Insira o seu e-mail!").email("Insira um e-mail válido!"),
         password: Yup.string().min(6, "Senha obrigatória")
       });
-
       await schema.validate(data, {
         abortEarly: false
+      });
+
+      signIn({
+         password: data.password,
+         email: data.email
       });
     } catch (error) {
       const erros = getValidationErrors(error);
       formRef.current?.setErrors(erros);
     }
-  }, []);
+  }, [signIn]);
 
   return(
     <Container>
