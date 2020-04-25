@@ -1,6 +1,7 @@
 import React, {useRef, useCallback} from 'react';
 import * as Yup from 'yup';
-import { useAuth } from '../../hooks/AuthContext';
+import { useAuth } from '../../hooks/auth';
+import { useToast } from '../../hooks/toast';
 import { Container, Content, Background } from './styles';
 import logoImg from '../../assets/logo.svg';
 import { FiLogIn, FiLock, FiMail} from 'react-icons/fi';
@@ -18,6 +19,7 @@ interface UserData{
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const {user, signIn } = useAuth();
+  const { addToast } = useToast();
 
   const handleSubmit = useCallback(async (data: UserData) => {
     try {
@@ -30,7 +32,7 @@ const SignIn: React.FC = () => {
         abortEarly: false
       });
 
-      signIn({
+      await signIn({
          password: data.password,
          email: data.email
       });
@@ -41,10 +43,10 @@ const SignIn: React.FC = () => {
         formRef.current?.setErrors(erros);
       }
 
-      //disparar um toast
+      addToast({type:"error", title:"Erro na autenticação", description:"Verifique o seu usuário ou a sua senha"});
 
     }
-  }, [signIn]);
+  }, [addToast, signIn]);
 
   return(
     <Container>
