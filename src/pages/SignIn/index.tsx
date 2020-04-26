@@ -10,6 +10,7 @@ import Input from '../../components/Input';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
 import getValidationErrors from '../../utils/getValidationErrors';
+import { Link } from 'react-router-dom';
 
 interface UserData{
   email: string;
@@ -60,10 +61,10 @@ const SignIn: React.FC = () => {
           <Button type="submit">Entrar</Button>
           <a href='forgot'>Esqueci minha senha</a>
         </Form>
-        <a href="create">
+        <Link to="/signup">
           <FiLogIn size={20} />
           Criar conta
-        </a>
+        </Link>
       </Content>
       <Background />
     </Container>
