@@ -6,15 +6,21 @@ interface RequestDTO {
   password: string;
 }
 
+interface User {
+  id: string;
+  name: string;
+  avatar_full_url: string;
+}
+
 interface AuthState{
   token: string;
-  user: object;
+  user: User;
 }
 
 interface AuthContextData {
   signOut(): void;
   signIn(credentials: RequestDTO): Promise<void>;
-  user: object;
+  user: User;
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -31,7 +37,7 @@ export const AuthProvider: React.FC = ({ children }) => {
   });
 
   const signIn = useCallback(async ({email, password}) => {
-    const response = await api.post('/sessions', {email, password});
+    const response = await api.post('/auth', {email, password});
     const {token, user} = response.data;
     localStorage.setItem('@goBarber:token', token);
     localStorage.setItem('@goBarber:user', JSON.stringify(user));

@@ -1,11 +1,15 @@
 import React, { ButtonHTMLAttributes } from 'react';
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  loading?: boolean
+};
 
-const Input: React.FC<ButtonProps> = ({ children, ...rest }) => {
+const Button: React.FC<ButtonProps> = ({ children, loading, ...rest }) => {
   return (
-    <button {...rest}>{children}</button>
+    <button {...rest}>{
+      loading ? 'Carregando...':children
+    }</button>
   );
 };
 
-export default Input;
+export default Button;
