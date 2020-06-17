@@ -53,7 +53,7 @@ const ResetPassowrd: React.FC = () => {
       addToast({type:"error", title:"Erro ao resetar senha"});
 
     }
-  }, [addToast]);
+  }, [addToast, history, location]);
 
   return(
     <Container>

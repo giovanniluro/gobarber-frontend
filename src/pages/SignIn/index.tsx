@@ -19,7 +19,7 @@ interface UserData{
 
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
-  const {user, signIn } = useAuth();
+  const { signIn } = useAuth();
   const { addToast } = useToast();
 
   const handleSubmit = useCallback(async (data: UserData) => {

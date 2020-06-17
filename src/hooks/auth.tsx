@@ -12,7 +12,7 @@ interface User {
   avatar_full_url: string;
 }
 
-interface AuthState{
+interface AuthState {
   token: string;
   user: User;
 }
@@ -30,19 +30,24 @@ export const AuthProvider: React.FC = ({ children }) => {
     const token = localStorage.getItem('@goBarber:token');
     const user = localStorage.getItem('@goBarber:user');
 
-    if(token && user){
-      return ({token, user: JSON.parse(user)});
+    if (token && user) {
+      api.defaults.headers.authorization = `Bearer ${token}`;
+      return ({ token, user: JSON.parse(user) });
     }
+
+
     return {} as AuthState;
   });
 
-  const signIn = useCallback(async ({email, password}) => {
-    const response = await api.post('/auth', {email, password});
-    const {token, user} = response.data;
+  const signIn = useCallback(async ({ email, password }) => {
+    const response = await api.post('/auth', { email, password });
+    const { token, user } = response.data;
     localStorage.setItem('@goBarber:token', token);
     localStorage.setItem('@goBarber:user', JSON.stringify(user));
 
-    setData({token, user});
+    api.defaults.headers.authorization = `Bearer ${token}`;
+
+    setData({ token, user });
   }, []);
 
   const signOut = useCallback(() => {
@@ -52,7 +57,7 @@ export const AuthProvider: React.FC = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{signOut, signIn, user: data.user}}>
+    <AuthContext.Provider value={{ signOut, signIn, user: data.user }}>
       {children}
     </AuthContext.Provider>
   )
@@ -61,7 +66,7 @@ export const AuthProvider: React.FC = ({ children }) => {
 export function useAuth(): AuthContextData {
   const context = useContext(AuthContext);
 
-  if(!context) throw Error("No context available");
+  if (!context) throw Error("No context available");
 
   return context;
 }
