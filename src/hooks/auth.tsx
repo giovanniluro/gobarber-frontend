@@ -9,6 +9,7 @@ interface RequestDTO {
 interface User {
   id: string;
   name: string;
+  email: string;
   avatar_full_url: string;
 }
 
@@ -20,6 +21,7 @@ interface AuthState {
 interface AuthContextData {
   signOut(): void;
   signIn(credentials: RequestDTO): Promise<void>;
+  updateUser(user: User): void;
   user: User;
 }
 
@@ -56,8 +58,19 @@ export const AuthProvider: React.FC = ({ children }) => {
     setData({} as AuthState);
   }, []);
 
+
+  const updateUser = useCallback((user: User) => {
+    setData({
+      token: data.token,
+      user
+    });
+
+    localStorage.setItem('@goBarber:user', JSON.stringify(user));
+
+  }, [setData, data.token]);
+
   return (
-    <AuthContext.Provider value={{ signOut, signIn, user: data.user }}>
+    <AuthContext.Provider value={{ signOut, signIn, user: data.user, updateUser }}>
       {children}
     </AuthContext.Provider>
   )
