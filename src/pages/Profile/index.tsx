@@ -15,6 +15,7 @@ import { useAuth } from '../../hooks/auth';
 interface ProfileFormData {
   name: string;
   email: string;
+  oldPassword: string;
   password: string;
 }
 
@@ -30,29 +31,56 @@ const Profile: React.FC = () => {
       const schema = Yup.object().shape({
         name: Yup.string().required("Insira o seu nome!"),
         email: Yup.string().required("Insira o seu e-mail!").email("Insira um e-mail válido!"),
-        password: Yup.string().min(6, "A senha deve ter no mínimo 6 carácteres!")
+        oldPassword: Yup.string(),
+        password: Yup.string().when('oldPassword', {
+          is: val => !!val.length,
+          then: Yup.string().required('Insira a nova senha!'),
+          otherwise: Yup.string()
+        })
       });
 
       await schema.validate(data, {
         abortEarly: false
       });
 
-      await api.post('/users', data);
+      const formData = Object.assign({
+        name: data.name,
+        email: data.email
+      }, data.password ? {
+        password: {
+          new: data.password,
+          old: data.oldPassword
+        }
+      } : {});
 
-      history.push('/');
+      console.log(formData);
+
+      const response = await api.put('/profile', formData);
+
+      console.log(response.data);
+
+      updateUser({
+        id: response.data.user.id,
+        name: response.data.user.name,
+        email: response.data.user.email,
+        avatar_full_url: response.data.user.avatar_full_url
+      });
+
+      history.push('/dashboard');
 
       addToast({
         title: "Sucesso!",
         type: "sucess",
-        description: "Cadastro no Gobarber concluído com sucesso!"
+        description: "Dados atualizados com sucesso!"
       })
 
     } catch (error) {
+      console.log(error);
       const erros = getValidationErros(error);
       formRef.current?.setErrors(erros);
 
       addToast({
-        title: "Erro no cadastro =(",
+        title: "Verifique os campos",
         type: "error",
         description: "Ops... Algo deu errado, tente novamente!"
       })
@@ -60,7 +88,7 @@ const Profile: React.FC = () => {
   }, [addToast, history]);
 
   const handleAvatarChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    if(e.target.files) {
+    if (e.target.files) {
       const data = new FormData();
 
       data.append('avatar', e.target.files[0]);

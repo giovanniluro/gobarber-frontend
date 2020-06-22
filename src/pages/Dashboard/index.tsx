@@ -99,7 +99,6 @@ const Dashboard: React.FC = () => {
       }
     }).then(response => {
       setAppointmets(response.data);
-      console.log(response.data);
     })
   }, [selectedDate]);
 
@@ -153,7 +152,6 @@ const Dashboard: React.FC = () => {
             {morningAppointments.length === 0 && <p> Não há agendamentos para este período </p>}
 
             {morningAppointments.map(appointment => {
-              console.log(appointment.user.avatar_full_url);
               return (
                 <Appointment key={appointment.id}>
                   <span>
@@ -174,7 +172,6 @@ const Dashboard: React.FC = () => {
             {afternoonAppointments.length === 0 && <p> Não há agendamentos para este período </p>}
 
             {afternoonAppointments.map(appointment => {
-              console.log(appointment.user.avatar_full_url);
               return (
                 <Appointment key={appointment.id}>
                   <span>
